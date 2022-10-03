@@ -1,0 +1,199 @@
+---
+title: 'Laboratorio 1.2: Exploración y Visualización de Datos'
+author: "Andrés Abeliuk, Hernán Sarmiento, Cinthia Sánchez, Jorge Ortiz"
+date: "Septiembre 2022"
+output: 
+  html_document: 
+    theme: default
+    toc: yes
+---
+
+# Declaración de compromiso ético
+
+Nosotros Samuel Chavez F. y Benjamin V. Rojas, declaramos que realizamos de manera grupal los pasos de la presente actividad. También declaramos no incurrir en copia, ni compartir nuestras respuestas con otras personas ni con otros grupos. Por lo que, ratificamos que las respuestas son de nuestra propia confección y reflejan nuestro propio conocimiento.
+
+# Instrucciones
+
+1.  Trabajen en equipos de dos personas. Salvo excepciones, no se corregirá entregas con menos de dos integrantes.
+
+2.  Modifique este archivo `.Rmd` agregando sus respuestas donde corresponda.
+
+3.  Para cada pregunta, cuando corresponda, **incluya el código fuente que utilizó para llegar a su respuesta**.
+
+4.  El formato de entrega para esta actividad es un archivo html. **Genere un archivo HTML usando RStudio** y súbalo a U-Cursos.
+
+Basta con que uno de los integrantes haga la entrega. Si ambos hacen una entrega en U-Cursos, se revisará cualquiera de éstas.
+
+# Laboratorio
+
+La primera parte de esta actividad son preguntas teóricas que avanzaron en las clases del curso de Minería de datos.
+
+## Teoría
+
+Se esperan respuestas breves y concisas, descritas con sus propias palabras según sus conocimientos y lo visto en clase. En caso de incluir alguna referencia externa, debe citarla.
+
+*1. ¿Por qué es importante el pre-procesamiento de los datos? Describa dos técnicas de pre-procesamiento.*
+
+**Respuesta:** La importancia de el pre-procesamiento de datos yace en que este logra generar datos que son mas faciles de manipular. Una tecnica de pre-procesamiento es la agregación, la cual corresponde en unir 2 atributos para generar solo 1. Con esto podemos lograr una reduccion significativa de datos y la generacion de resumenes con los cuales se pueden realizar analisis de datos. Otra tecnica de pre-procesamiento es la reduccion de dimensionalidad, con lo cual se logran reducir costos en memoria y/o tiempo con lo cual se permite un procesamiento de datos mas rapidos i.e una descripcion/analisis de los datos a un menor costo.
+
+*2. Describa dos medidas de tendencia central y explique sus posibles utilidades para el análisis exploratorio de datos.*
+
+**Respuesta:**
+
+Dos medidas de tendencia central son la moda y la media. La moda representa el valor mas frecuente en un conjunto de datos. La media por otra parte, representa el promedio de un conjunto de datos. Estas medidas buscan resumir el conjunto de datos en un solo valor.
+
+*3. ¿Qué es una matriz de correlación y para qué sirve?*
+
+**Respuesta:** Una matriz de correlacion es un tipo de matriz en las cuales se define el coeficiente de correlaccion para determinar la dependencia de 2 variables i,j. Con esta matriz podemos notar si las variables estan correlacionadas entre si, y de estarlo cual es el factor de correlacion entre estas.
+
+## Práctica
+
+### Dataset 1: Accidentes de tránsito
+
+Para esta sección utilizaremos un dataset real de número de accidentes de tránsito por localidad, el cual puede ser encontrado en el siguiente link: <http://datos.gob.cl/dataset/9348>. Para cargar el dataset ejecute el siguiente código:
+
+```{r}
+tipos <- read.table("https://users.dcc.uchile.cl/~hsarmien/mineria/datasets/accidentes_2010_2011.txt", encoding = "UTF-8", as.is = F)
+head(tipos)
+```
+
+Explore el set de datos para responder las siguientes preguntas:
+
+1.  ¿Cuáles son las dimensiones del dataset (filas, columnas)? Recuerde adjuntar código.
+
+```{r}
+# RESPUESTA
+dim(tipos)
+
+```
+
+2.  ¿Qué describe cada fila del dataset? Ejemplifique tomando la fila 200, extienda la descripción.
+
+```{r}
+# RESPUESTA
+tipos[200,]
+# Muestra: Origen de la muestra, nacional, regional o comunal
+# Descripcion: Localidad informada
+# Anio: Año ocurrido
+# TipoAccidente: Categoria del tipo de accidente informado
+# Cantidad: Numero de accidentes conocidos en aquel año
+
+```
+
+3.  ¿En qué año hubo más accidentes a nivel nacional?. Muestre la cantidad de accidentes por año.
+
+```{r}
+# RESPUESTA
+# Es el 2011, como podemos aca ver filtrado
+aggregate(Cantidad ~ Anio, tipos[tipos$Muestra == "Nacional", ], FUN=sum)
+
+```
+
+"
+
+4.  Filtre los datos para incluir sólo los accidentes ocurridos el año 2011 a nivel `Regional`. Luego, genere un gráfico de barras (ggplot) que muestre la cantidad de accidentes en cada Región. Las regiones deben mostrarse ordenadas descendentemente (según la cantidad de accidentes). Comente sus principales observaciones y si considera que es razonable usar el conteo de frecuencias para determinar las regiones que tuvieron más accidentes.
+
+**Respuesta textual:**
+
+```{r}
+# RESPUESTA
+
+acc11reg     <- tipos[tipos$Anio == 2011 & tipos$Muestra == "Regional",]
+acc11regAcum <- aggregate(Cantidad ~ Descripcion, acc11reg, FUN=sum)
+library(ggplot2)
+ggplot(acc11regAcum, aes(x = reorder(Descripcion, Cantidad), y = Cantidad)) +
+          geom_bar(stat = "identity") + 
+          coord_flip()+
+          ggtitle(label = "Top mejores regiones para tener tu accidente")
+
+# Sorprendente como la reg metropolitana tiene al rededor de la misma cantidad de accidentes que el resto de las regiones muestreadas combinadas!
+```
+
+### Dataset 2: Diamantes
+
+Considere el dataset **diamonds** que contiene los precios y otros atributos de casi 54.000 diamantes. Los atributos del dataset son los siguientes:
+
+-   **price**: precio en dólares estadounidenses (\$326--\$18.823)
+
+-   **carat**: o quilates, peso del diamante (0,2--5,01)
+
+-   **cut**: o corte, calidad de la talla (Fair, Good, Very Good, Premium, Ideal) = (regular, buena, muy buena, superior, ideal)
+
+-   **color**: color del diamante, de D (mejor) a J (peor)
+
+-   **clarity**: medida de la claridad del diamante (I1 (peor), SI2, SI1, VS2, VS1, VVS2, VVS1, IF (mejor))
+
+-   **x**: longitud en mm (0--10,74)
+
+-   **y**: anchura en mm (0--58,9)
+
+-   **z**: profundidad en mm (0--31,8)
+
+-   **depth**: porcentaje de profundidad total = z / media(x, y) = 2 \* z / (x + y) (43--79)
+
+-   **table**: anchura de la parte superior del diamante en relación con el punto más ancho (43--95)
+
+Fuente: <https://ggplot2.tidyverse.org/reference/diamonds.html>
+
+```{r}
+diamonds <- read.csv("https://raw.githubusercontent.com/mwaskom/seaborn-data/master/diamonds.csv")
+head(diamonds)
+```
+
+1.  Señale qué atributos son categóricos (indique si son nominales u ordinales) y cuáles son numéricos (indique si son intervalos o razón).
+
+**Respuesta:** Investigando segun como lo describe la fuente del dataset.
+
+-   Categóricos nominales: No se añade ninguno pues, todos los categoricos son nominales segun la documentacion.
+-   Categóricos ordinales: cut, color, clarity
+-   Númericos intervalos: table, depth, price (Estan en dolares no en "valor absoluto", incomparable con el precio pero en otra moneda por ejemplo).
+-   Numéricos razón: carat, x, y, z.
+
+2.  Para cada calidad de diamantes (variable `cut`), muestre, en una tabla o dataframe, su precio promedio ordenado de forma ascendente.
+
+```{r}
+# RESPUESTA
+
+dia2 <- aggregate(price ~ cut, diamonds, FUN=mean)
+dia2[order(dia2$price),]
+```
+
+3.  ¿Qué atributos están más correlacionados con el precio del diamante (variable `price`)? ¿Qué significa esto? Seleccione las columnas cuantitativas.
+
+```{r}
+# RESPUESTA
+cor(diamonds[c(1,5,6,7,8,9,10)])
+# carat es el mas relacionado!
+# significa que el valor del diamante se correlaciona
+# mucho con la cantidad de masa que tiene la piesa, stonks!
+```
+
+4.  ¿Qué muestra el siguiente gráfico? ¿Cuáles son sus principales observaciones?
+
+```{r}
+
+boxplot(diamonds$price)
+
+# Es un grafico de caja, nos muestra la simetria general de los precios de los diamantes
+# destacamos que en caja se encuentra el 50% de las muestras es decir los que 
+# estan dentro de Q1 y Q3, esta seccion la divide la mediana (el valor en medio
+# de los datos ordenados)
+# Tambien vemos los brazos de extension vizualizando el rango del los precios
+# tipicos
+# de misma forma y representada con una barra negra, vemos el maximo precio
+# encontrado, un dato "atipico" y que extiende los brazos mostrando
+# bastante variacion al corriente de los otros precios
+```
+
+**Respuesta:**
+
+5.  **Preprocesamiento:** Remueva los diamantes con precios 'outliers'. Para esto podemos calcular el Z-score del atributo precio y remover las instancias con un Z-score anormalmente alto o bajo (Z \> 3 o Z \< -3). $$ z =\frac{x_i-\mu}{\sigma}$$ La fórmula anterior se utiliza para *estandarizar* los datos (media 0 y desviación estándar 1), donde cada celda indicará *cuántas desviaciones estándar se está alejando del promedio de su columna*.
+
+```{r}
+# RESPUESTA
+
+sigma <- sd(diamonds$price)
+mu    <- mean(diamonds$price)
+filtrd<- subset(diamonds, abs((diamonds$price - mu)/sigma) > 3)
+head(filtrd)
+```

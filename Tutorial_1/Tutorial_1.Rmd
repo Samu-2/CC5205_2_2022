@@ -16,7 +16,7 @@ editor_options:
 
 # Declaración
 
-Yo, **AGREGUE SU NOMBRE COMPLETO**, declaro que realicé los pasos de la presente actividad.
+Yo, **Samuel Chávez F.**, declaro que realicé los pasos de la presente actividad.
 
 # Instrucciones
 

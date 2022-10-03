@@ -1,0 +1,6 @@
+sepal_length,sepal_width,petal_length,petal_width,variety,origin,color,new col
+5.6,3.0,4.1,1.3,New2 Versicolor,Unk,New2 Versicolor New Column,New2 Versicolor_Unk
+6.3,2.5,4.9,1.5,Versicolor,Unk,Versicolor New Column,Versicolor_Unk
+5.4,3.4,1.7,0.2,Setosa,Unk,Setosa New Column,Setosa_Unk
+5.4,3.9,1.3,0.4,Setosa,Unk,Setosa New Column,Setosa_Unk
+6.5,3.0,5.2,2.0,Virginica,Unk,Virginica New Column,Virginica_Unk
