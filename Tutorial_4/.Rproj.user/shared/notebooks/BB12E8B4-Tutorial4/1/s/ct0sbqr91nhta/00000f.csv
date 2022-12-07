@@ -1,0 +1,1 @@
+"0","inspect(df)   # para ver las reglas (si el dataset es largo, usar inspect(head(df))"
